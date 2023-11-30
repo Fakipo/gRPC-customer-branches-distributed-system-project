@@ -8,7 +8,6 @@ class Customer:
         self.id = id
         self.events = events
         self.recvMsg = list()
-        self.finalAppend = list()
         self.stub = None
 
     # Setup gRPC channel & client stub for branch
@@ -22,21 +21,17 @@ class Customer:
         for event in self.events:
             if event["interface"] != "query":
                 response = self.stub.MsgDelivery(
-                    example_pb2.MsgRequest(id=event["id"], branchId=event["branch"], interface=event["interface"], money=event["money"])
+                    example_pb2.MsgRequest(id=event["id"], interface=event["interface"], money=event["money"])
                 )
             else:
                 response = self.stub.MsgDelivery(
-                    example_pb2.MsgRequest(id=event["id"], branchId=event["branch"], interface=event["interface"])
+                    example_pb2.MsgRequest(id=event["id"], interface=event["interface"])
                 )
-            # print(event["branch"])
             if response.interface != "query":
-                stringToAppend = {"interface": response.interface, "result": response.result, "branch": event["branch"]}
+                stringToAppend = {"interface": response.interface, "result": response.result}
             else:
-                stringToAppend = {"interface": response.interface, "balance": response.money, "branch": event["branch"]}
+                stringToAppend = {"interface": response.interface,  "balance": response.money}
             self.recvMsg.append(stringToAppend)
 
     def output(self):
-        output_list = []
-        for event in self.recvMsg:
-            output_list.append({"id": self.id, "recv": [event]})
-        return output_list
+        return {"id": self.id, "recv": self.recvMsg}

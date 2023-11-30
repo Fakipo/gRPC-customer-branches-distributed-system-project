@@ -71,8 +71,9 @@ def customerProcessing(customer):
 
 
 def writeOutputToFile(output):
-    with open("output.json", "a") as output_file:
-        output_file.write(json.dumps(output, indent=2) + "\n")
+    with open("output.txt", "a") as output_file:
+        output_file.write(str(output) + "\n")
+
 def read_input_file(input_file_path):
     try:
         with open(input_file_path, 'r') as file:
@@ -86,7 +87,7 @@ def theCallFunc():
     try:
         #Read input data from input.json
         input_data = read_input_file('input.json')
-        open("output.json", "w").close()
+        open("output.txt", "w").close()
         initialize_processes_from_input(input_data)
     except FileNotFoundError:
         print("input.json not found")
