@@ -19,8 +19,8 @@ class Branch(example_pb2_grpc.BranchServicer):
         ]
 
     def extendedMsgForProp(self, request, propagate):
+        # print(request.branchId)
         result = "success"
-
         if request.money < 0:
             result = "fail"
         elif request.interface == "query":
@@ -39,22 +39,22 @@ class Branch(example_pb2_grpc.BranchServicer):
         else:
             result = "fail"
 
-        msg = {"interface": request.interface, "result": result}
+        msg = {"interface": request.interface, "result": result, "branchId" : request.branchId}
 
         if request.interface != "query":
             msg["result"] = result
         else:
             msg["money"] = request.money
         self.recvMsg.append(msg)
-        return example_pb2.MsgResponse(interface=request.interface, result=result, money=self.balance)
+        return example_pb2.MsgResponse(interface=request.interface, result=result, money=self.balance, branchId = request.branchId)
 
     def Propagate_Withdraw(self, request):
         for stub in self.stubList:
-            stub.MsgPropagation(example_pb2.MsgRequest(id=request.id, interface="withdraw", money=request.money))
+            stub.MsgPropagation(example_pb2.MsgRequest(id=request.id, interface="withdraw", branchId = request.branchId, money=request.money))
 
     def Propagate_Deposit(self, request):
         for stub in self.stubList:
-            stub.MsgPropagation(example_pb2.MsgRequest(id=request.id, interface="deposit", money=request.money))
+            stub.MsgPropagation(example_pb2.MsgRequest(id=request.id, interface="deposit", branchId = request.branchId, money=request.money))
 
     def MsgDelivery(self, request, context):
         return self.extendedMsgForProp(request, True)
